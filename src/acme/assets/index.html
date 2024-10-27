@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAhQAAAIUB4uz/wQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAQfSURBVEiJlZXNb5RVFMZ/594770zpdAr9wlagYD8g0Frkw+jChRjjRvxIjImJS7cmLty40rX+D7IwhgUxhiB2IwsSEr9AKVhamtaAFLDMUAYo05n34x4X006n0xH0rt73nuc8z3POved9hSZLFRNNDI55zMsCLwHbEelG6QIV4C7KIsK0qvxog/QFR/Kz7JsMG7mkmUB4cfiMwpGNys0zXO4gIpm82XWs54kCeml0S+grt1HSuihQBi0DiYBfARkFJ0gapL2LoP8QPlqMzfKF1sYqTKNAxZffB9I8As0L+lAgqiMH8AIh6EPw8wWS4gLJo4suNr2fPLaC8LfhMTWcBdr9DYFHdeE0SAyabGyR5BxueAgb9Pkkmj/qBk5+X4vp9O62KJRh9f4N4CMgp0VB/27o3hZF2hW9bqpn0bBSe/Zju3pRDdWHhTNQPmbV/CCVieFPUT5bBTYlB2SnIhlFFwW9I2v1r4qJITU0iu3pq+UklflvjHi9DkAF9JppSk4bSKbKlNrxLJJOgYC01pWinmhmgvDyT2hpqarp9YbBMLUSr96WDdYV0109Ydu6G5PZhtnWCxmH7R/aAPf379XKMhKfNam0uQLEkqbpHZcuIACT7sW2DKK+jEYLuP6d2PYdGxOsQ1qyqCaglXEje64+BM5jgNYGsFGkQxHXjsuOgSbED85jcj3Yjh2ISSOBW8/f0Q0iaPwgL0PjleocqH4HIG0N12OTIDaDyx0CscRLlxC3Gbd5BDHpKqZBwHRsrT4kS+OwMmge+zWg0qaIrWuPs7jcYcRkSEozaFLGZfeuN1GJ1vBBgO3sAZSY5S9qAi3PTV9DGMcAW9aqMNlOxOXwlZv4yk1S7YeoH36NS2i0Nnm2bxcYi4aF2fTg6T+oR5vEfw4rAiu7Pn8PH+aJl6ZwucMgqXXmk8W/1tynAlxvfzUvvP9xjXf1IXVg9izKuFiwT+eqDisR0fR5XHYUsdl15L60QDx7vfbuntkL1uLDwrzbc+pkbb8+SZ3/0EjnlVT/CwGl30nu3kEfQDQ1he0rIplNEFVICnl8vrjWms6nsN29qCZ4Lb5Xz7lOIDM6O+dnD5wGeZutHpYcVGJ0aZl45k+aLdmUxQ2NVA2Gt46lBk6dWxdvTFDFxNNHzuGXX7SZMcLLv6DlUnPyllaC0eeRIIOPCnN211eDjZgN/wMRvAsLr9rW4XuSbiEYOVxtTRPnq+QaF++aUnl/UxNNrQF6+c3t2tY1KS7XRhwTzU2S5G8BYHv6SA2MgLVoXCxIXNwng9/e+V8CADr5Wodv6ZkwQdc2gGRhHozBdlc/yRoWZmS5fFD2nVj6N47HCkD1TJK5d47bdN+7tTHXRH14+0s7cOKDJ+U/UWB1RVdff8UG3ccVHyXh4lvB7lO//pe8fwAm9atzdybScgAAAABJRU5ErkJggg==">
+    <title>SBC: {{ file_name }}</title>
+    <style>
+    @font-face {
+      font-family: 'Fira Mono';
+      src: url(data:application/x-font-woff;charset=utf-8;base64,{{ font }}) format('woff');
+      font-weight: 400;
+      font-style: normal;
+    }
+    </style>
+    <style>{{ css_content | safe }}</style>
+    <script>{{ js_content | safe }}</script>
+  </head>
+
+  <body>
+    <div id="main">
+      <div id="sidebar">
+        <div id="expand" data-expanded="false">[expand]</div>
+        {%- include 'tree.html' -%}
+      </div>
+      <div id="content">
+        <div class="realm-select-container">
+          <label for="realmSelect">Realm Specifics:</label>
+          <select id="realmSelect">
+            <option value="*">*</option>
+            {%- for realm in cfg.get("realm-config", []) %}
+            <option value="{{ realm.get("identifier") }}">{{ realm.get("identifier") }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+        <div class="config">
+          <pre>{{ cfg_text }}</pre>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

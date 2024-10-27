@@ -1,0 +1,209 @@
+body {
+    --font-family: "Fira Mono";
+    --sidebar-color: #fafafa;
+    --muted-color: #616161;
+    --accent-color: #2979FF;
+    --tree-spacing: 1.5em;
+    --tree-disclosure-radius: 8px;
+    --tree-border-color: #ddd;
+    --tree-disclosure-color-fg: #fff;
+    --tree-disclosure-color-bg: #696;
+
+    font-size: 14px;
+    font-family: var(--font-family);
+    color: #212121;
+    padding: 10px;
+    margin: 0;
+    scroll-behavior: smooth;
+    overflow: auto;
+}
+
+#main {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 20rem;
+    background-color: var(--sidebar-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+#expand {
+    z-index: 1;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+#expand:hover {
+    color: var(--accent-color);
+}
+
+#content {
+    margin-left: 21rem;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.realm-select-container {
+    position: fixed;
+    top: 0;
+    background-color: #fff;
+    z-index: 1;
+    border: none;
+    padding: 5px 10px 10px 10px;
+    width: 100%;
+}
+
+.realm-select-container {
+    font-weight: 600;
+}
+
+.scroll-marker {
+    visibility: hidden;
+    padding-top: 45px;
+    margin-top: -45px;
+    display: inline-block;
+}
+
+.tree {
+    padding: 0;
+    margin: 0;
+}
+
+.tree li {
+    display: block;
+    position: relative;
+    padding-left: calc(2 * var(--tree-spacing) - var(--tree-disclosure-radius) - 2px);
+}
+
+.tree ul {
+    margin-left: calc(var(--tree-disclosure-radius) - var(--tree-spacing));
+    padding-left: 0;
+}
+
+.tree ul li {
+    border-left: 2px solid var(--tree-border-color);
+}
+
+.tree ul li:last-child {
+    border-color: transparent;
+}
+
+.tree ul li::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: calc(var(--tree-spacing) / -2);
+    left: -2px;
+    width: calc(var(--tree-spacing) + 2px);
+    height: calc(var(--tree-spacing) + 1px);
+    border: solid var(--tree-border-color);
+    border-width: 0 0 2px 2px;
+}
+
+.tree span.summary,
+.tree summary {
+    display: block;
+    cursor: pointer;
+    padding-top: 0.28rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.tree span.summary a,
+.tree summary {
+    font-family: var(--font-family);
+}
+
+.tree span.summary a:hover,
+.tree summary:hover {
+    color: var(--accent-color);
+}
+
+.tree summary::marker,
+.tree summary::-webkit-details-marker {
+    display: none;
+}
+
+.tree summary:focus-visible,
+.tree summary:focus {
+    outline: none;
+}
+
+.tree li::after,
+.tree summary::before {
+    content: "+";
+    display: block;
+    position: absolute;
+    top: calc(var(--tree-spacing) / 2 - var(--tree-disclosure-radius) + 1px);
+    left: calc(var(--tree-spacing) - var(--tree-disclosure-radius) - 1px);
+    width: calc(2 * var(--tree-disclosure-radius));
+    height: calc(2 * var(--tree-disclosure-radius));
+    border-radius: 50%;
+    background: var(--tree-border-color);
+    color: var(--tree-border-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tree summary::before {
+    z-index: 1;
+    background: var(--tree-disclosure-color-bg);
+    color: var(--tree-disclosure-color-fg);
+}
+
+.tree details[open]>summary::before {
+    content: "\2212";
+}
+
+.tree .count {
+    color: var(--muted-color);
+}
+
+.tree a {
+    color: #212121;
+    text-decoration: none;
+}
+
+.config {
+    padding: 10px;
+}
+
+pre code {
+    padding: 0;
+    margin: 0;
+    /* firefox exclusive */
+    font-family: var(--font-family);
+}
+
+.config b {
+    font-weight: 400;
+    color: var(--accent-color);
+}
+
+.config a {
+    color: var(--accent-color);
+}
+
+.config a:visited {
+    color: var(--accent-color);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.display-block {
+    display: block !important;
+}

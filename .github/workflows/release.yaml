@@ -1,0 +1,80 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Build | Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build | Setup Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+
+      - name: Build | Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+          installer-parallel: true
+
+      - name: Build | Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Build | Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Build | Run PyInstaller
+        run: |
+          source $VENV
+          poetry run build
+
+      - name: Build | Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: dist/
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Release | Download dist
+        uses: actions/download-artifact@v4
+
+      - name: Release | List content
+        run: ls -R
+
+      - name: Release | Publish to Github
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-ubuntu-latest/*
+            dist-windows-latest/*

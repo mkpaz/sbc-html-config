@@ -1,0 +1,29 @@
+<ul class="tree">
+  <li>
+    <details open>
+      <summary>Config</summary>
+      <ul>
+        {%- for top_key, top_value in cfg.items() %}
+        <li class="level1">
+          {%- if top_value|is_list -%}
+          <details>
+            <summary>{{ top_key }}&nbsp;<span class="count">[{{top_value|length}}]</span></summary>
+            <ul>
+              {%- for item in top_value -%}
+              <li><span class="summary level2" data-realms="{{ item | realm_ids(top_key, ctx) }}">
+                <a href="#{{ top_key }}_{{ loop.index0 }}">{{ item | tree_item_name(top_key, loop.index0) }}</a>
+              </span></li>
+              {%- endfor -%}
+            </ul>
+          </details>
+          {%- else -%}
+          <span data-realms="{{ top_value | realm_ids(top_key, ctx) }}" class="summary level1">
+            <a href="#{{ top_key }}">{{ top_key }}</a>
+          </span>
+          {%- endif -%}
+        </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  </li>
+</ul>

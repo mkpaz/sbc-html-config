@@ -1,0 +1,100 @@
+[tool.poetry]
+name = "sbc-html-config"
+version = "1.0.0"
+description = ""
+authors = []
+packages = [{ include = "src" }]
+include = [{ path = "src/acme/assets" }]
+
+[tool.poetry.scripts]
+build = "pyinstaller:install"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+tk = "^0.1.0"
+customtkinter = "^5.2.2"
+jinja2 = "^3.1.4"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+ruff = "^0.0.271"
+isort = "^5.12.0"
+pytest = "^7.3.2"
+pyinstaller = "^6.11.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# enable pycodestyle (`E`) and Pyflakes (`F`) codes by default
+select = ["E", "F"]
+ignore = []
+
+# allow autofix for all enabled rules (when `--fix`) is provided
+fixable = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "I",
+    "N",
+    "Q",
+    "S",
+    "T",
+    "W",
+    "ANN",
+    "ARG",
+    "BLE",
+    "COM",
+    "DJ",
+    "DTZ",
+    "EM",
+    "ERA",
+    "EXE",
+    "FBT",
+    "ICN",
+    "INP",
+    "ISC",
+    "NPY",
+    "PD",
+    "PGH",
+    "PIE",
+    "PL",
+    "PT",
+    "PTH",
+    "PYI",
+    "RET",
+    "RSE",
+    "RUF",
+    "SIM",
+    "SLF",
+    "TCH",
+    "TID",
+    "TRY",
+    "UP",
+    "YTT",
+]
+unfixable = []
+
+# exclude directories
+exclude = [".venv", "__pycache__", "contrib", "dist", "output"]
+
+line-length = 100
+
+# allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# assume Python 3.10
+target-version = "py310"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+# path to the sources for pytest
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = ["--import-mode=importlib"]
