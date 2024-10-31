@@ -1,7 +1,7 @@
 import sys
 import webbrowser
 from pathlib import Path
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from typing import Any
 
 import acme.renderer as renderer
@@ -10,18 +10,31 @@ import env
 from acme.parser import to_json
 
 
+def _show_error(message: str, gui_mode: bool) -> None:
+    if gui_mode:
+        messagebox.showerror("Error", message)
+    else:
+        print(message)
+
+
 def _process_file(source_file: Path, open_file: ctk.StringVar | None = None):
-    if not source_file.is_file():
-        print(f"File doesn't exist or not readable: {source_file}")
-        return
+    gui_mode: bool = open_file is not None
 
-    json_cfg: dict[str, Any] = {}
-    with open(source_file, "r") as f:
-        json_cfg = to_json(f.read())
+    try:
+        if not source_file.is_file():
+            _show_error(f"File doesn't exist or not readable: {source_file}", gui_mode)
+            return
 
-    if not json_cfg:
-        print(f"Unable to parse config file: {source_file}")
-        return
+        json_cfg: dict[str, Any] = {}
+        with open(source_file, "r") as f:
+            json_cfg = to_json(f.read())
+
+        if not json_cfg:
+            print(f"Unable to parse config file: {source_file}")
+            return
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Unable to parse config file: {e}")
 
     dest_file: Path = source_file.parent / (source_file.stem + ".html")
     html = renderer.render(json_cfg, dest_file.name)
@@ -29,7 +42,10 @@ def _process_file(source_file: Path, open_file: ctk.StringVar | None = None):
     # import json
     # _write_file(source_file.parent / (source_file.stem + ".json"), json.dumps(json_cfg, indent=4))
 
-    _write_file(dest_file, html)
+    try:
+        _write_file(dest_file, html)
+    except Exception as e:
+        messagebox.showerror("Error", f"Unable to write HTML file: {e}")
 
     if open_file and open_file.get() == "on":
         webbrowser.open(str(dest_file))
