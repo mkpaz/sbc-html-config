@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 PROJECT_NAME: str = "SBC HTML Config"
-VERSION: str = "1.0.0"
+VERSION: str = "1.0.1"
 
 BUNDLED: bool = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 
