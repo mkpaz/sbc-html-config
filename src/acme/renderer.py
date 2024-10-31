@@ -4,12 +4,12 @@ from typing import Any
 
 import util as u
 from acme.context import ConfigElement, Context
-from env import ROOT_DIR
+from env import MEIPASS_DIR
 from jinja2 import Environment, FileSystemLoader, Template
 
 __all__ = ["render"]
 
-ASSETS_DIR: Path = ROOT_DIR / "acme/assets"
+ASSETS_DIR: Path = MEIPASS_DIR / "acme/assets"
 ENV: Environment = Environment(loader=FileSystemLoader(ASSETS_DIR))
 TAB_SIZE: int = 8
 KEY_PAD_SIZE = 48

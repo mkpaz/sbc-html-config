@@ -1,6 +1,7 @@
 from enum import Enum
 from traceback import print_exc
 from typing import Any
+from env import get_config
 
 __all__ = ["to_json"]
 
@@ -159,11 +160,12 @@ _TOP_LEVEL_CFG: set[str] = {
 
 
 class _CfgLine:
-    def __init__(self, line: str):
+    def __init__(self, line: str, top_level_items: set[str] = _TOP_LEVEL_CFG):
         self.line: str = line
         self.offset: int = -1
         self.left: str | None = None
         self.right: str | None = None
+        self.top_level_items: set[str] = top_level_items
 
         if len(self.line) > 0:
             pair_line: str
@@ -176,7 +178,9 @@ class _CfgLine:
                 self.right = pair[1].strip()
 
     def is_garbage(self) -> bool:
-        return self.offset == -1 or (self.is_top() and self.left not in _TOP_LEVEL_CFG)
+        return self.offset == -1 or (
+            self.is_top() and self.left not in self.top_level_items
+        )
 
     def is_top(self) -> bool:
         return self.offset == 0
@@ -203,7 +207,7 @@ def _get_line_offset(line) -> tuple[str, int]:
 
 def _prepare(src: str) -> list[str]:
     result: list[str] = []
-    lines : list[str] = src.splitlines()
+    lines: list[str] = src.splitlines()
 
     skip_line: bool = False
     for idx, line in enumerate(lines):
@@ -239,10 +243,10 @@ def _prepare(src: str) -> list[str]:
             next_tidy_line, next_offset = _get_line_offset(next_line)
             next_parts: list[str] = next_tidy_line.split(" ", 1)
             if len(next_parts) == 1 and next_offset >= prev_key_end:
-                 result.append(line + next_line)
-                 print(f"join: {idx}, {line + next_line}")
-                 skip_line = True
-                 continue
+                result.append(line + next_line)
+                #print(f"join: {idx}, {line + next_line}")
+                skip_line = True
+                continue
             else:
                 result.append(line)
 
@@ -264,8 +268,16 @@ def to_json(src: str) -> dict[str, Any]:
 
     lines: list[str] = _prepare(src)
 
+    top_level_items: set[str] = _TOP_LEVEL_CFG
+    try:
+        raw_items: str = get_config().get("top-level-items", "")
+        if raw_items:
+            top_level_items.update(item.strip() for item in raw_items.split(","))
+    except Exception:
+        pass
+
     for idx, raw_line in enumerate(lines):
-        line = _CfgLine(raw_line)
+        line = _CfgLine(raw_line, top_level_items)
         line_type = _LineType.UNKNOWN
 
         next_offset = 0
