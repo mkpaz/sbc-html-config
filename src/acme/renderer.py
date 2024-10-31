@@ -149,7 +149,7 @@ def _get_tree_item_name(value: dict[str, Any], param_name: str, idx: int) -> str
             result = f'from {value.get("source-address")}'
         case "codec-policy":
             result = value.get("name")
-        case "host-route":
+        case "host-route" | "host-routes":
             result = f'to {value.get("dest-network")}'
         case "local-policy":
             source_realm_raw: str | list[str] = value.get("source-realm", "*")
@@ -161,9 +161,9 @@ def _get_tree_item_name(value: dict[str, Any], param_name: str, idx: int) -> str
             next_hop: str = ";".join(Context.get_local_policy_next_hop(value))
             result = f"from {source_realm} to {next_hop or '?'}"
         case "network-interface":
-            result = (
-                f'{Context.get_network_interface_id(value)} {value.get("ip-address")}'
-            )
+            result = Context.get_network_interface_id(value)
+            if value.get("ip-address"):
+                result = result + " " + value.get("ip-address", "")
         case "phy-interface":
             result = value.get("name")
         case "realm-config":

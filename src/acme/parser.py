@@ -38,6 +38,7 @@ _TOP_LEVEL_CFG: set[str] = {
     "h323",
     "home-subscriber-server",
     "host-route",
+    "host-routes",
     "http-alg",
     "http-client",
     "http-server",
@@ -159,7 +160,7 @@ _TOP_LEVEL_CFG: set[str] = {
 
 class _CfgLine:
     def __init__(self, line: str):
-        self.line: str = line.rstrip().replace("\t", " ")
+        self.line: str = line
         self.offset: int = -1
         self.left: str | None = None
         self.right: str | None = None
@@ -200,6 +201,57 @@ def _get_line_offset(line) -> tuple[str, int]:
 ###############################################################################
 
 
+def _prepare(src: str) -> list[str]:
+    result: list[str] = []
+    lines : list[str] = src.splitlines()
+
+    skip_line: bool = False
+    for idx, line in enumerate(lines):
+        if not line:
+            continue
+
+        if skip_line:
+            skip_line = False
+            continue
+
+        line = line.rstrip().replace("\t", "  ")
+
+        # support old config format:
+        #     key           <- if key value is string list, it starts from the new line
+        #             value1
+        #             value2
+        # ... we turn this into that if the value start position > key end position
+        #     key     value1
+        #             value2
+        # ... to distinguish string lists from nested objects
+        #     key          <- pray that the key has enough length
+        #       nested_key
+
+        tidy_line, offset = _get_line_offset(line)
+        parts: list[str] = tidy_line.split(" ", 1)
+
+        if len(parts) == 1 and idx < len(lines) - 1:
+            next_line: str = lines[idx + 1].rstrip().replace("\t", "  ")
+            if not next_line:
+                continue
+
+            prev_key_end: int = offset + len(parts[0])
+            next_tidy_line, next_offset = _get_line_offset(next_line)
+            next_parts: list[str] = next_tidy_line.split(" ", 1)
+            if len(next_parts) == 1 and next_offset >= prev_key_end:
+                 result.append(line + next_line)
+                 print(f"join: {idx}, {line + next_line}")
+                 skip_line = True
+                 continue
+            else:
+                result.append(line)
+
+        else:
+            result.append(line)
+
+    return result
+
+
 def to_json(src: str) -> dict[str, Any]:
     tree: dict[str, Any] = {}
     path: list = [(tree, -1)]
@@ -210,7 +262,7 @@ def to_json(src: str) -> dict[str, Any]:
     prev_offset: int = 0
     last_key = ""
 
-    lines: list[str] = src.splitlines()
+    lines: list[str] = _prepare(src)
 
     for idx, raw_line in enumerate(lines):
         line = _CfgLine(raw_line)
